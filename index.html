@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rapor Digital — Pondok Pesantren</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1b2a22;
+  --ink-soft:#4b5c52;
+  --paper:#faf7ee;
+  --paper-2:#f2ecd9;
+  --line:#d9d0b4;
+  --emerald:#0e4d3c;
+  --emerald-2:#146650;
+  --emerald-soft:#e4efe9;
+  --gold:#b9862f;
+  --gold-soft:#f3e6c6;
+  --red:#a3372c;
+  --red-soft:#f8e6e2;
+  --radius:10px;
+  --shadow: 0 1px 2px rgba(27,42,34,.06), 0 6px 20px rgba(27,42,34,.06);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background: var(--paper);
+  color:var(--ink);
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:14.5px;
+  line-height:1.5;
+}
+.bg-pattern{
+  background-image: radial-gradient(circle at 1px 1px, rgba(14,77,60,.08) 1px, transparent 0);
+  background-size: 16px 16px;
+}
+h1,h2,h3,h4{ font-family:'Fraunces', serif; font-weight:600; color:var(--emerald); margin:0 0 4px; }
+a{color:var(--emerald-2);}
+button{ font-family:inherit; cursor:pointer; }
+input,select,textarea{ font-family:inherit; }
+
+/* ---------- App shell ---------- */
+#app{ min-height:100vh; display:flex; flex-direction:column; }
+
+.topbar{
+  background: linear-gradient(135deg, var(--emerald) 0%, var(--emerald-2) 100%);
+  color:#fdf9ec;
+  padding:14px 22px;
+  display:flex; align-items:center; gap:14px;
+  box-shadow: var(--shadow);
+  position:sticky; top:0; z-index:50;
+}
+.topbar .mark{
+  width:38px;height:38px;border-radius:9px;
+  background: var(--gold-soft);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Amiri', serif; font-size:20px; color:var(--emerald); font-weight:700;
+  flex:none;
+}
+.topbar .titles{ line-height:1.25; }
+.topbar .titles .t1{ font-family:'Fraunces',serif; font-size:17px; font-weight:600; letter-spacing:.2px;}
+.topbar .titles .t2{ font-size:11.5px; color:#dfe8de; letter-spacing:.4px; text-transform:uppercase;}
+.topbar .spacer{flex:1;}
+.topbar .unit-badge{ font-size:12px; background:rgba(255,255,255,.12); padding:6px 12px; border-radius:20px; }
+.topbar .btn-logout{ all:unset; cursor:pointer; font-size:12px; color:#fdf9ec; background:rgba(255,255,255,.14); padding:6px 12px; border-radius:20px; }
+.topbar .btn-logout:hover{ background:rgba(255,255,255,.24); }
+
+/* ---------- Login page ---------- */
+.login-wrap{ min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--paper); padding:20px; }
+.login-card{ background:#fff; border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); width:380px; max-width:100%; padding:32px 28px; }
+.login-card .mark{ width:46px;height:46px;border-radius:11px; background:var(--gold-soft); display:flex;align-items:center;justify-content:center; font-family:'Amiri',serif; font-size:24px; color:var(--emerald); font-weight:700; margin-bottom:14px; }
+.login-card h1{ font-size:20px; margin-bottom:4px; }
+.login-card .sub{ color:var(--ink-soft); font-size:13px; margin-bottom:20px; }
+.login-card .field{ margin-bottom:14px; }
+.login-card label{ display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:5px; }
+.login-card input{ width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; font-size:14px; }
+.login-card input:focus{ outline:2px solid var(--emerald-soft); border-color:var(--emerald-2); }
+.login-card .btn-login{ all:unset; box-sizing:border-box; width:100%; text-align:center; background:var(--emerald); color:#fdf9ec; padding:11px; border-radius:8px; font-weight:600; cursor:pointer; margin-top:6px; }
+.login-card .btn-login:hover{ background:var(--emerald-2); }
+.login-card .btn-login:disabled{ opacity:.6; cursor:default; }
+.login-card .err{ background:var(--red-soft); color:var(--red); font-size:12.5px; padding:9px 11px; border-radius:8px; margin-bottom:14px; display:none; }
+.login-card .err.show{ display:block; }
+.login-card .foot{ text-align:center; font-size:11.5px; color:#8f9a8a; margin-top:18px; }
+
+.layout{ flex:1; display:flex; min-height:0; }
+
+.sidenav{
+  width:216px; flex:none; background:var(--paper-2);
+  border-right:1px solid var(--line);
+  padding:16px 10px;
+  display:flex; flex-direction:column; gap:2px;
+}
+.sidenav button{
+  all:unset; box-sizing:border-box;
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:8px; font-size:13.5px; font-weight:500;
+  color:var(--ink-soft);
+}
+.sidenav button .ic{ width:18px; text-align:center; font-size:14px; }
+.sidenav button:hover{ background:rgba(14,77,60,.07); color:var(--ink); }
+.sidenav button.active{ background:var(--emerald); color:#fdf9ec; }
+.sidenav .grp-label{ font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:#8f9a8a; padding:14px 12px 4px; }
+
+main{ flex:1; overflow-y:auto; padding:24px 28px 60px; }
+.container{ max-width:1180px; margin:0 auto; }
+
+.page-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:18px; flex-wrap:wrap;}
+.page-head h1{ font-size:23px; }
+.page-head .sub{ color:var(--ink-soft); font-size:13px; }
+
+.card{
+  background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:18px 20px; margin-bottom:18px;
+}
+.card h3{ font-size:15px; margin-bottom:10px; padding-bottom:8px; border-bottom:1px dashed var(--line);}
+.card h3 .tag{ font-size:10.5px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:.5px; margin-left:8px;}
+
+.grid{ display:grid; gap:14px; }
+.grid.cols-2{ grid-template-columns:1fr 1fr; }
+.grid.cols-3{ grid-template-columns:1fr 1fr 1fr; }
+.grid.cols-4{ grid-template-columns:repeat(4,1fr); }
+@media(max-width:900px){ .grid.cols-2,.grid.cols-3,.grid.cols-4{ grid-template-columns:1fr; } }
+
+label{ display:block; font-size:12px; font-weight:600; color:var(--ink-soft); margin-bottom:4px; }
+input[type=text],input[type=number],select,textarea{
+  width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:7px;
+  background:#fffdf7; color:var(--ink); font-size:13.5px;
+}
+input:focus,select:focus,textarea:focus{ outline:2px solid var(--gold); outline-offset:0; border-color:var(--gold);}
+textarea{ resize:vertical; min-height:64px; }
+.field{ margin-bottom:10px; }
+
+.btn{
+  display:inline-flex; align-items:center; gap:7px;
+  padding:9px 16px; border-radius:8px; border:1px solid transparent;
+  font-size:13px; font-weight:600; background:var(--emerald); color:#fff;
+}
+.btn:hover{ background:var(--emerald-2); }
+.btn.secondary{ background:#fff; border-color:var(--line); color:var(--ink); }
+.btn.secondary:hover{ background:var(--paper-2); }
+.btn.gold{ background:var(--gold); }
+.btn.gold:hover{ background:#a3781f; }
+.btn.danger{ background:#fff; border-color:var(--red-soft); color:var(--red); }
+.btn.danger:hover{ background:var(--red-soft); }
+.btn.sm{ padding:6px 11px; font-size:12px; }
+.btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+table{ width:100%; border-collapse:collapse; font-size:13px; }
+th,td{ border:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:middle;}
+th{ background:var(--emerald-soft); color:var(--emerald); font-size:11.5px; text-transform:uppercase; letter-spacing:.3px; font-weight:700;}
+tbody tr:nth-child(even){ background:#fbfaf3; }
+td input[type=number], td input[type=text]{ width:100%; min-width:52px; padding:5px 6px; font-size:13px; }
+.tbl-wrap{ overflow-x:auto; }
+.num{ text-align:right; font-variant-numeric:tabular-nums; }
+.center{ text-align:center; }
+.muted{ color:#96a094; }
+.pill{ display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:700; }
+.pill.green{ background:var(--emerald-soft); color:var(--emerald);}
+.pill.gold{ background:var(--gold-soft); color:#8a641f;}
+.pill.red{ background:var(--red-soft); color:var(--red);}
+
+.chip-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px;}
+.chip{ padding:6px 12px; border-radius:20px; border:1px solid var(--line); font-size:12.5px; font-weight:600; background:#fff; color:var(--ink-soft);}
+.chip.active{ background:var(--emerald); border-color:var(--emerald); color:#fff; }
+
+.toast{
+  position:fixed; bottom:22px; right:22px; background:var(--emerald); color:#fff;
+  padding:11px 18px; border-radius:9px; font-size:13px; font-weight:600; box-shadow:var(--shadow);
+  opacity:0; transform:translateY(8px); transition:all .25s ease; z-index:200; pointer-events:none;
+}
+.toast.show{ opacity:1; transform:translateY(0); }
+
+.empty{ text-align:center; padding:40px 20px; color:var(--ink-soft); }
+.empty .ic{ font-size:30px; margin-bottom:8px; }
+
+.stat-card{ background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow);}
+.stat-card .n{ font-family:'Fraunces',serif; font-size:28px; color:var(--emerald); font-weight:600; line-height:1;}
+.stat-card .l{ font-size:12px; color:var(--ink-soft); margin-top:6px;}
+
+.bar-row{ display:flex; align-items:center; gap:10px; margin-bottom:7px; }
+.bar-row .lbl{ width:150px; font-size:12px; color:var(--ink-soft); flex:none; text-align:right;}
+.bar-track{ flex:1; height:14px; background:var(--paper-2); border-radius:7px; overflow:hidden; }
+.bar-fill{ height:100%; background:linear-gradient(90deg,var(--emerald),var(--gold)); border-radius:7px; }
+.bar-val{ width:42px; font-size:12px; font-weight:700; color:var(--emerald); text-align:left;}
+
+/* ---------- Rapor print sheet ---------- */
+.rapor-sheet{
+  background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:32px 36px; max-width:900px; margin:0 auto;
+  font-family:'Inter',sans-serif; color:#111;
+}
+.rapor-sheet .kop{ text-align:center; border-bottom:3px double var(--emerald); padding-bottom:10px; margin-bottom:14px;}
+.rapor-sheet .kop .y1{ font-family:'Fraunces',serif; font-weight:700; font-size:16px; color:var(--emerald); letter-spacing:.3px;}
+.rapor-sheet .kop .y2{ font-size:12.5px; color:var(--ink-soft); }
+.rapor-sheet h2.title{ text-align:center; font-size:15px; letter-spacing:1px; margin:10px 0 14px; text-transform:uppercase; color:var(--ink);}
+.ident-tbl td{ border:none; padding:2px 4px; font-size:12.8px; }
+.ident-tbl td.lbl{ width:90px; color:var(--ink-soft); }
+.ident-tbl td.colon{ width:10px; }
+.sect-title{ font-size:13px; font-weight:700; color:var(--emerald); margin:16px 0 6px; text-transform:uppercase; letter-spacing:.4px;}
+.rapor-sheet table.data th, .rapor-sheet table.data td{ font-size:11.6px; padding:4px 6px; }
+.rapor-sheet table.data th{ font-size:10px; }
+.sign-block{ display:flex; justify-content:space-between; margin-top:34px; font-size:12.5px; }
+.sign-block .col{ width:32%; text-align:center; }
+.sign-block .sp{ height:56px; }
+.ip-badge{ display:inline-block; padding:3px 12px; border-radius:20px; font-weight:700; font-size:12.5px; }
+
+@media print{
+  body *{ visibility:hidden; }
+  #print-area, #print-area *{ visibility:visible; }
+  #print-area{ position:absolute; left:0; top:0; width:100%; }
+  .rapor-sheet, .leger-sheet{ box-shadow:none; border:none; max-width:100%; }
+  .no-print{ display:none !important; }
+}
+.leger-sheet{ background:#fff; border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:22px; }
+.leger-sheet table{ font-size:11.5px; }
+.leger-sheet th{ font-size:10px; }
+
+.scroll-x{ overflow-x:auto; }
+.footer-note{ text-align:center; font-size:11.5px; color:#a9ae9c; padding:18px 0 6px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================= DATA MODEL ============================= */
+const SUBJECTS = [
+ {id:'aqidah', label:'Aqidah (Tauhid)', bidang:'Diniyah'},
+ {id:'fiqh',   label:'Fiqh Ibadah', bidang:'Diniyah'},
+ {id:'adab',   label:'Adab Penuntut Ilmu', bidang:'Diniyah'},
+ {id:'siroh',  label:'Siroh Nabawiyah', bidang:'Diniyah'},
+ {id:'tajwid', label:'Tajwid', bidang:'Diniyah'},
+ {id:'tafsir', label:'Tafsir Juz 30', bidang:'Diniyah'},
+ {id:'uqur',   label:"Ulumul Qur'an", bidang:'Diniyah'},
+ {id:'barab',  label:'Bahasa Arab', bidang:'Bahasa Arab'},
+ {id:'qiroah', label:"Al Qiro'ah", bidang:'Bahasa Arab'},
+ {id:'nahwu',  label:'Nahwu', bidang:'Bahasa Arab'},
+ {id:'sorof',  label:'Sorof', bidang:'Bahasa Arab'},
+ {id:'imla',   label:"Khot wal Imla'", bidang:'Bahasa Arab'},
+];
+const KELAS_LIST = ['1 SMA','2 SMA','3 SMA'];
+const ROMAN = ['','I','II','III','IV','V','VI'];
+
+function defaultSettings(){
+  const defSKS = {aqidah:4,fiqh:4,adab:4,siroh:4,tajwid:2,tafsir:1,uqur:2,barab:6,qiroah:2,nahwu:4,sorof:2,imla:2};
+  const sksMatrix = {};
+  KELAS_LIST.forEach(k=> sksMatrix[k]=Object.assign({},defSKS));
+  return {
+    yayasan:'YAYASAN PENDIDIKAN ISLAM AR RAUDHOH',
+    unit:'PONDOK PESANTREN AR RAUDHOH',
+    alamat:'Jln. Damai Handil 1 RT. 2',
+    kelurahan:'Muara Jawa Ulu', kecamatan:'Muara Jawa', kota:'Kabupaten Kutai Kartanegara', provinsi:'Kalimantan Timur',
+    kepalaUnit:'', tahunAjaran:'2025-2026',
+    waliKelas:{'1 SMA':'','2 SMA':'','3 SMA':''},
+    sksMatrix, ekskulList:['Futsal','Berenang'],
+    kkmHafalan:70,
+    predikat:[{min:90,label:'Mumtaz (Istimewa)'},{min:80,label:'Jayyid Jiddan (Sangat Baik)'},{min:70,label:'Jayyid (Baik)'},{min:60,label:'Maqbul (Cukup)'},{min:0,label:'Rasib (Perlu Bimbingan)'}]
+  };
+}
+
+const state = { settings:null, santri:[], records:{}, tab:'dashboard', ready:false, userName:'' };
+
+function recKey(santriId,kelas,semester){ return santriId+'::'+kelas+'::'+semester; }
+function blankRecord(){
+  const nilai={}; SUBJECTS.forEach(s=> nilai[s.id]={uts:'',uhtg:'',hdr:'',nuAwal:'',nuHer:''});
+  return {
+    nilai,
+    hafalan:{ alquran:{nilai:'',jumlah:'',surah:''}, hadis:{nh:'',nu:'',jumlah:''}, matan:{nh:'',nu:'',jumlah:''} },
+    kehadiran:{sakit:'',izin:'',alpa:''},
+    ekskul:{},
+    catatan:'',
+    tglRapor:''
+  };
+}
+function getRecord(santriId,kelas,semester){
+  const k = recKey(santriId,kelas,semester);
+  if(!state.records[k]) return null;
+  return state.records[k];
+}
+function getOrBlank(santriId,kelas,semester){
+  return getRecord(santriId,kelas,semester) || blankRecord();
+}
+
+/* ---------- auth + storage (backend API, bukan window.storage) ---------- */
+const AUTH_TOKEN_KEY = 'rapor_token';
+function getToken(){ return localStorage.getItem(AUTH_TOKEN_KEY); }
+function setToken(t){ localStorage.setItem(AUTH_TOKEN_KEY, t); }
+function clearToken(){ localStorage.removeItem(AUTH_TOKEN_KEY); }
+
+async function apiFetch(path, opts){
+  opts = opts || {};
+  const headers = Object.assign({}, opts.headers||{}, { 'Authorization': 'Bearer '+getToken() });
+  if(opts.body && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
+  const res = await fetch(path, Object.assign({}, opts, { headers }));
+  if(res.status === 401){
+    clearToken();
+    showLogin('Sesi berakhir, silakan login kembali.');
+    throw new Error('unauthorized');
+  }
+  if(!res.ok){
+    let msg = 'Terjadi kesalahan server';
+    try{ const j = await res.json(); if(j.error) msg = j.error; }catch(e){}
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
+async function apiGetData(key){
+  const r = await apiFetch('/api/data/'+key);
+  return r.value;
+}
+async function apiSetData(key, value){
+  // saveRecords/saveSantri/saveSettings menunggu Promise ini selesai SEBELUM
+  // menganggap data tersimpan — sebelumnya (window.storage) kegagalan di sini
+  // tidak pernah tertangkap sehingga nilai santri terlihat "tersimpan" padahal
+  // gagal ditulis ke database. Sekarang kegagalan akan dilempar sebagai error
+  // dan ditangkap oleh pemanggil (lihat tombol simpan nilai) agar user diberi tahu.
+  return apiFetch('/api/data/'+key, { method:'PUT', body: JSON.stringify({ value }) });
+}
+
+async function loadAll(){
+  const ds = defaultSettings();
+  try{ const v = await apiGetData('settings'); state.settings = v ? v : ds; }
+  catch(e){ state.settings = ds; }
+  // merge in any new default fields for forward-compat
+  state.settings = Object.assign({}, ds, state.settings);
+  state.settings.sksMatrix = Object.assign({}, ds.sksMatrix, state.settings.sksMatrix||{});
+  KELAS_LIST.forEach(k=>{ state.settings.sksMatrix[k] = Object.assign({}, ds.sksMatrix[k], (state.settings.sksMatrix[k]||{})); });
+  state.settings.waliKelas = Object.assign({}, ds.waliKelas, state.settings.waliKelas||{});
+
+  try{ const v = await apiGetData('santri'); state.santri = v ? v : []; }
+  catch(e){ state.santri = []; }
+  try{ const v = await apiGetData('records'); state.records = v ? v : {}; }
+  catch(e){ state.records = {}; }
+  state.ready = true;
+}
+async function saveSettings(){ await apiSetData('settings', state.settings); }
+async function saveSantri(){ await apiSetData('santri', state.santri); }
+async function saveRecords(){ await apiSetData('records', state.records); }
+
+function uid(){ return 'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=> t.classList.remove('show'), 2200);
+}
+function n(v){ const x = Number(v); return (v===''||v===null||v===undefined||isNaN(x)) ? null : x; }
+function fmt(v,d){ return (v===null||v===undefined||isNaN(v)) ? '-' : Number(v).toFixed(d===undefined?1:d).replace(/\.0$/,''); }
+function esc(s){ return (s===null||s===undefined)?'':String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ============================= CALCULATIONS ============================= */
+function calcMapel(nilaiObj, sks){
+  sks = Number(sks)||0;
+  const uts=n(nilaiObj.uts), uhtg=n(nilaiObj.uhtg), hdr=n(nilaiObj.hdr);
+  const hasNH = uts!==null || uhtg!==null || hdr!==null;
+  const nh = hasNH ? (uts||0)+(uhtg||0)+(hdr||0) : null;
+  const nuA = n(nilaiObj.nuAwal), nuH = n(nilaiObj.nuHer);
+  let nkAwal = (nh===null || nuA===null) ? null : nh+nuA;
+  let nkHer = null;
+  if(nkAwal!==null && nkAwal<60 && nuH!==null){ nkHer = (nh||0) + (nuA+nuH)/2; }
+  let nk = nkAwal;
+  if(nkHer!==null && (nk===null || nkHer>nk)) nk = nkHer;
+  if(sks<=0) nk = null;
+  const na = (nk===null) ? null : nk*sks;
+  return {nh, nkAwal, nkHer, nk, na, sks};
+}
+function calcHafalanNK(h){
+  const nh=n(h.nh), nu=n(h.nu);
+  if(nh===null && nu===null) return null;
+  return (nh||0)+(nu||0);
+}
+function periodeList(){
+  const list=[];
+  KELAS_LIST.forEach((k,ki)=>{ [1,2].forEach(s=>{ list.push({kelas:k, semester:s, idx:ki*2+s}); }); });
+  return list;
+}
+function computeIP(santriId, kelas, semester){
+  const rec = getRecord(santriId,kelas,semester);
+  if(!rec) return null;
+  const sksMap = state.settings.sksMatrix[kelas]||{};
+  let totalSKS=0, totalNA=0, any=false;
+  SUBJECTS.forEach(s=>{
+    const sks = Number(sksMap[s.id])||0;
+    if(sks<=0) return;
+    const c = calcMapel(rec.nilai[s.id]||{}, sks);
+    if(c.nk!==null){ totalSKS+=sks; totalNA+=c.na; any=true; }
+  });
+  if(!any || totalSKS===0) return null;
+  return totalNA/totalSKS;
+}
+function computeIPK(santriId, uptoKelas, uptoSemester){
+  const uptoIdx = periodeIdxOf(uptoKelas,uptoSemester);
+  const ips=[];
+  periodeList().forEach(p=>{
+    if(p.idx>uptoIdx) return;
+    const ip = computeIP(santriId,p.kelas,p.semester);
+    if(ip!==null) ips.push(ip);
+  });
+  if(ips.length===0) return null;
+  return ips.reduce((a,b)=>a+b,0)/ips.length;
+}
+function periodeIdxOf(kelas,semester){ return KELAS_LIST.indexOf(kelas)*2 + Number(semester); }
+function predikatFor(ip){
+  if(ip===null) return '-';
+  const list = state.settings.predikat.slice().sort((a,b)=>b.min-a.min);
+  for(const p of list){ if(ip>=p.min) return p.label; }
+  return '-';
+}
+function rankingFor(santriId,kelas,semester){
+  const rows = state.santri
+    .map(sT=>({id:sT.id, ip:computeIP(sT.id,kelas,semester)}))
+    .filter(r=> r.ip!==null);
+  if(rows.length===0) return {rank:null,total:0};
+  rows.sort((a,b)=> b.ip-a.ip);
+  const idx = rows.findIndex(r=>r.id===santriId);
+  return { rank: idx>=0? idx+1 : null, total: rows.length };
+}
+
+/* ============================= RENDER: SHELL ============================= */
+const NAV = [
+  {grp:'Ringkasan', items:[ ['dashboard','◆','Dashboard'] ]},
+  {grp:'Data', items:[ ['santri','◆','Data Santri'], ['pengaturan','◆','Pengaturan'] ]},
+  {grp:'Penilaian', items:[ ['input','◆','Input Nilai Semester'], ['leger','◆','Leger Per Kelas'] ]},
+  {grp:'Laporan', items:[ ['rapor','◆','Cetak Rapor'], ['riwayat','◆','Riwayat 6 Semester'] ]},
+];
+
+function renderShell(){
+  const s = state.settings;
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="topbar no-print">
+      <div class="mark">ﷲ</div>
+      <div class="titles">
+        <div class="t1">Rapor Digital Santri</div>
+        <div class="t2">${esc(s.unit)}</div>
+      </div>
+      <div class="spacer"></div>
+      <div class="unit-badge">T.A. ${esc(s.tahunAjaran)}</div>
+      <button class="btn-logout" id="btnLogout">⎋ ${esc(state.userName||'')} · Keluar</button>
+    </div>
+    <div class="layout">
+      <div class="sidenav no-print" id="sidenav"></div>
+      <main id="main"></main>
+    </div>
+    <div class="footer-note no-print">Data tersimpan otomatis &middot; dapat diakses bersama oleh staf yang membuka tautan aplikasi ini</div>
+  `;
+  renderSidenav();
+  renderTab();
+  document.getElementById('btnLogout').onclick = ()=>{
+    if(confirm('Keluar dari aplikasi?')){ clearToken(); showLogin(); }
+  };
+}
+function renderSidenav(){
+  const el = document.getElementById('sidenav');
+  let html='';
+  NAV.forEach(g=>{
+    html += `<div class="grp-label">${g.grp}</div>`;
+    g.items.forEach(([key,ic,label])=>{
+      html += `<button data-tab="${key}" class="${state.tab===key?'active':''}"><span class="ic">${ic}</span>${label}</button>`;
+    });
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('button[data-tab]').forEach(b=>{
+    b.onclick = ()=>{ state.tab = b.dataset.tab; renderSidenav(); renderTab(); };
+  });
+}
+function renderTab(){
+  const main = document.getElementById('main');
+  main.innerHTML = '<div class="container" id="container"></div>';
+  const c = document.getElementById('container');
+  if(state.tab==='dashboard') return renderDashboard(c);
+  if(state.tab==='santri') return renderSantriPage(c);
+  if(state.tab==='pengaturan') return renderPengaturan(c);
+  if(state.tab==='input') return renderInputNilai(c);
+  if(state.tab==='leger') return renderLeger(c);
+  if(state.tab==='rapor') return renderRaporPage(c);
+  if(state.tab==='riwayat') return renderRiwayat(c);
+}
+
+/* ============================= DASHBOARD ============================= */
+function renderDashboard(c){
+  const total = state.santri.length;
+  const perKelas = {}; KELAS_LIST.forEach(k=>perKelas[k]=state.santri.filter(x=>x.kelasSekarang===k).length);
+  let recCount = Object.keys(state.records).length;
+
+  // rata-rata IP tiap kelas (semester terbaru yang tersedia = 2 lalu 1)
+  const rataKelas = {};
+  KELAS_LIST.forEach(k=>{
+    const santriK = state.santri.filter(x=>x.kelasSekarang===k);
+    let vals=[];
+    santriK.forEach(st=>{
+      let ip = computeIP(st.id,k,2); if(ip===null) ip = computeIP(st.id,k,1);
+      if(ip!==null) vals.push(ip);
+    });
+    rataKelas[k] = vals.length? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+  });
+
+  c.innerHTML = `
+    <div class="page-head">
+      <div><h1>Dashboard</h1><div class="sub">${esc(state.settings.unit)} &middot; Tahun Ajaran ${esc(state.settings.tahunAjaran)}</div></div>
+    </div>
+    <div class="grid cols-4" style="margin-bottom:18px;">
+      <div class="stat-card"><div class="n">${total}</div><div class="l">Total Santri</div></div>
+      <div class="stat-card"><div class="n">${perKelas['1 SMA']}</div><div class="l">Kelas 1 SMA</div></div>
+      <div class="stat-card"><div class="n">${perKelas['2 SMA']}</div><div class="l">Kelas 2 SMA</div></div>
+      <div class="stat-card"><div class="n">${perKelas['3 SMA']}</div><div class="l">Kelas 3 SMA</div></div>
+    </div>
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>Rata-rata IP per Kelas <span class="tag">semester terbaru terisi</span></h3>
+        ${KELAS_LIST.map(k=>`
+          <div class="bar-row">
+            <div class="lbl">${k}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${rataKelas[k]?Math.min(100,rataKelas[k]):0}%"></div></div>
+            <div class="bar-val">${rataKelas[k]!==null?fmt(rataKelas[k],1):'-'}</div>
+          </div>`).join('')}
+      </div>
+      <div class="card">
+        <h3>Mulai Cepat</h3>
+        <p class="muted" style="margin-top:0;">Alur kerja yang disarankan untuk mengisi rapor satu angkatan penuh (kelas 1 semester 1 s/d kelas 3 semester 2):</p>
+        <ol style="padding-left:18px; color:var(--ink-soft); font-size:13px;">
+          <li>Lengkapi <b>Pengaturan</b> — data lembaga &amp; bobot SKS tiap mapel per kelas.</li>
+          <li>Tambahkan santri di <b>Data Santri</b>.</li>
+          <li>Isi nilai tiap semester di <b>Input Nilai Semester</b> (bisa diisi untuk semester lampau maupun berjalan).</li>
+          <li>Cek rekap satu kelas di <b>Leger Per Kelas</b>.</li>
+          <li>Cetak hasil akhir di <b>Cetak Rapor</b>, atau lihat progres 6 semester di <b>Riwayat</b>.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Ringkasan Data</h3>
+      <p class="muted" style="margin:0;">Total ${recCount} catatan nilai semester tersimpan dari ${total} santri terdaftar.</p>
+    </div>
+  `;
+}
+
+/* ============================= DATA SANTRI ============================= */
+function renderSantriPage(c){
+  c.innerHTML = `
+    <div class="page-head">
+      <div><h1>Data Santri</h1><div class="sub">Kelola daftar santri lintas kelas 1–3 SMA</div></div>
+      <button class="btn" id="btnAdd">+ Tambah Santri</button>
+    </div>
+    <div class="card">
+      <div class="chip-row" id="filterChips"></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:34px;">No</th><th>Nama Santri</th><th>NISN</th><th>Kelas Saat Ini</th><th>Nama Orang Tua/Wali</th><th>Alamat</th><th style="width:150px;">Aksi</th></tr></thead>
+          <tbody id="santriBody"></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  state.__santriFilter = state.__santriFilter || 'Semua';
+  const chipsEl = document.getElementById('filterChips');
+  ['Semua',...KELAS_LIST].forEach(k=>{
+    const chip = document.createElement('span');
+    chip.className = 'chip'+(state.__santriFilter===k?' active':'');
+    chip.textContent = k;
+    chip.onclick = ()=>{ state.__santriFilter=k; renderSantriPage(c); };
+    chipsEl.appendChild(chip);
+  });
+  const body = document.getElementById('santriBody');
+  const list = state.santri.filter(s=> state.__santriFilter==='Semua' || s.kelasSekarang===state.__santriFilter);
+  if(list.length===0){
+    body.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="ic">◇</div>Belum ada santri. Klik "Tambah Santri" untuk mulai.</div></td></tr>`;
+  } else {
+    body.innerHTML = list.map((s,i)=>`
+      <tr>
+        <td class="center">${i+1}</td>
+        <td><b>${esc(s.nama)}</b></td>
+        <td>${esc(s.nisn||'-')}</td>
+        <td><span class="pill green">${esc(s.kelasSekarang)}</span></td>
+        <td>${esc(s.ortu||'-')}</td>
+        <td>${esc(s.alamat||'-')}</td>
+        <td>
+          <button class="btn secondary sm" data-edit="${s.id}">Edit</button>
+          <button class="btn danger sm" data-del="${s.id}">Hapus</button>
+        </td>
+      </tr>`).join('');
+  }
+  document.getElementById('btnAdd').onclick = ()=> openSantriModal(null,c);
+  body.querySelectorAll('[data-edit]').forEach(b=> b.onclick=()=> openSantriModal(b.dataset.edit,c));
+  body.querySelectorAll('[data-del]').forEach(b=> b.onclick=async ()=>{
+    if(confirm('Hapus santri ini beserta seluruh riwayat nilainya? Tindakan tidak dapat dibatalkan.')){
+      const id=b.dataset.del;
+      const backupSantri = state.santri.slice();
+      const backupRecords = Object.assign({}, state.records);
+      state.santri = state.santri.filter(x=>x.id!==id);
+      Object.keys(state.records).forEach(k=>{ if(k.startsWith(id+'::')) delete state.records[k]; });
+      try{
+        await saveSantri(); await saveRecords();
+        showToast('Santri dihapus'); renderSantriPage(c);
+      }catch(err){
+        state.santri = backupSantri; state.records = backupRecords;
+        alert('Gagal menghapus santri: '+err.message+'. Perubahan dibatalkan, coba lagi.');
+      }
+    }
+  });
+}
+function openSantriModal(id,c){
+  const existing = id? state.santri.find(x=>x.id===id) : null;
+  const overlay = document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(27,42,34,.45);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px;';
+  overlay.innerHTML = `
+    <div class="card" style="width:460px;max-width:100%;margin:0;">
+      <h3>${existing?'Edit Santri':'Tambah Santri'}</h3>
+      <div class="field"><label>Nama Lengkap</label><input type="text" id="fNama" value="${esc(existing?existing.nama:'')}"></div>
+      <div class="grid cols-2">
+        <div class="field"><label>NISN</label><input type="text" id="fNisn" value="${esc(existing?existing.nisn:'')}"></div>
+        <div class="field"><label>Kelas Saat Ini</label>
+          <select id="fKelas">${KELAS_LIST.map(k=>`<option value="${k}" ${existing&&existing.kelasSekarang===k?'selected':''}>${k}</option>`).join('')}</select>
+        </div>
+      </div>
+      <div class="field"><label>Nama Orang Tua/Wali</label><input type="text" id="fOrtu" value="${esc(existing?existing.ortu:'')}"></div>
+      <div class="field"><label>Alamat</label><input type="text" id="fAlamat" value="${esc(existing?existing.alamat:'')}"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;">
+        <button class="btn secondary" id="mCancel">Batal</button>
+        <button class="btn" id="mSave">Simpan</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#mCancel').onclick = ()=> overlay.remove();
+  overlay.onclick = (e)=>{ if(e.target===overlay) overlay.remove(); };
+  overlay.querySelector('#mSave').onclick = async ()=>{
+    const nama = overlay.querySelector('#fNama').value.trim();
+    if(!nama){ alert('Nama wajib diisi.'); return; }
+    const data = {
+      nama, nisn: overlay.querySelector('#fNisn').value.trim(),
+      kelasSekarang: overlay.querySelector('#fKelas').value,
+      ortu: overlay.querySelector('#fOrtu').value.trim(),
+      alamat: overlay.querySelector('#fAlamat').value.trim(),
+    };
+    if(existing){ Object.assign(existing,data); } else { data.id=uid(); state.santri.push(data); }
+    const btn = overlay.querySelector('#mSave'); btn.disabled = true; btn.textContent='Menyimpan...';
+    try{
+      await saveSantri();
+      overlay.remove(); showToast('Data santri disimpan'); renderSantriPage(c);
+    }catch(err){
+      btn.disabled = false; btn.textContent='Simpan';
+      alert('Gagal menyimpan data santri: '+err.message+'. Periksa koneksi internet lalu coba lagi.');
+    }
+  };
+}
+
+/* ============================= PENGATURAN ============================= */
+function renderPengaturan(c){
+  const s = state.settings;
+  c.innerHTML = `
+    <div class="page-head"><div><h1>Pengaturan</h1><div class="sub">Data lembaga &amp; bobot kurikulum</div></div></div>
+
+    <div class="card">
+      <h3>Data Lembaga</h3>
+      <div class="grid cols-2">
+        <div class="field"><label>Nama Yayasan</label><input id="pYayasan" type="text" value="${esc(s.yayasan)}"></div>
+        <div class="field"><label>Nama Unit</label><input id="pUnit" type="text" value="${esc(s.unit)}"></div>
+        <div class="field"><label>Alamat</label><input id="pAlamat" type="text" value="${esc(s.alamat)}"></div>
+        <div class="field"><label>Kelurahan</label><input id="pKel" type="text" value="${esc(s.kelurahan)}"></div>
+        <div class="field"><label>Kecamatan</label><input id="pKec" type="text" value="${esc(s.kecamatan)}"></div>
+        <div class="field"><label>Kota/Kabupaten</label><input id="pKota" type="text" value="${esc(s.kota)}"></div>
+        <div class="field"><label>Provinsi</label><input id="pProv" type="text" value="${esc(s.provinsi)}"></div>
+        <div class="field"><label>Nama Kepala Unit</label><input id="pKepala" type="text" value="${esc(s.kepalaUnit)}"></div>
+        <div class="field"><label>Tahun Pembelajaran</label><input id="pTahun" type="text" value="${esc(s.tahunAjaran)}"></div>
+      </div>
+      <h3 style="margin-top:16px;">Wali Kelas</h3>
+      <div class="grid cols-3">
+        ${KELAS_LIST.map(k=>`<div class="field"><label>Wali Kelas ${k}</label><input class="wali-input" data-k="${k}" type="text" value="${esc(s.waliKelas[k]||'')}"></div>`).join('')}
+      </div>
+      <button class="btn" id="saveLembaga">Simpan Data Lembaga</button>
+    </div>
+
+    <div class="card">
+      <h3>Bobot SKS per Mata Pelajaran <span class="tag">isi 0 jika mapel tidak diajarkan di kelas tsb</span></h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Mata Pelajaran</th><th>Bidang</th>${KELAS_LIST.map(k=>`<th class="center">${k}</th>`).join('')}</tr></thead>
+          <tbody>
+          ${SUBJECTS.map(sub=>`
+            <tr>
+              <td>${sub.label}</td>
+              <td class="muted">${sub.bidang}</td>
+              ${KELAS_LIST.map(k=>`<td><input type="number" min="0" class="sks-input" data-k="${k}" data-sub="${sub.id}" value="${s.sksMatrix[k][sub.id]}" style="width:60px;"></td>`).join('')}
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <button class="btn" id="saveSKS" style="margin-top:12px;">Simpan Bobot SKS</button>
+    </div>
+
+    <div class="card">
+      <h3>Daftar Ekstrakurikuler</h3>
+      <div id="ekskulList"></div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <input type="text" id="newEkskul" placeholder="Nama ekstrakurikuler baru...">
+        <button class="btn secondary" id="addEkskul">+ Tambah</button>
+      </div>
+    </div>
+  `;
+  const renderEksList = ()=>{
+    document.getElementById('ekskulList').innerHTML = s.ekskulList.map((ek,i)=>`
+      <span class="chip" style="display:inline-flex;align-items:center;gap:8px;margin:0 6px 6px 0;">
+        ${esc(ek)} <span data-rm="${i}" style="cursor:pointer;color:var(--red);font-weight:700;">&times;</span>
+      </span>`).join('') || '<span class="muted">Belum ada ekstrakurikuler.</span>';
+    document.querySelectorAll('[data-rm]').forEach(b=> b.onclick=async ()=>{
+      s.ekskulList.splice(Number(b.dataset.rm),1); await saveSettings(); renderEksList(); showToast('Ekstrakurikuler dihapus');
+    });
+  };
+  renderEksList();
+  document.getElementById('addEkskul').onclick = async ()=>{
+    const inp = document.getElementById('newEkskul');
+    const v = inp.value.trim();
+    if(!v) return;
+    s.ekskulList.push(v); inp.value=''; await saveSettings(); renderEksList(); showToast('Ekstrakurikuler ditambahkan');
+  };
+  document.getElementById('saveLembaga').onclick = async ()=>{
+    s.yayasan=document.getElementById('pYayasan').value;
+    s.unit=document.getElementById('pUnit').value;
+    s.alamat=document.getElementById('pAlamat').value;
+    s.kelurahan=document.getElementById('pKel').value;
+    s.kecamatan=document.getElementById('pKec').value;
+    s.kota=document.getElementById('pKota').value;
+    s.provinsi=document.getElementById('pProv').value;
+    s.kepalaUnit=document.getElementById('pKepala').value;
+    s.tahunAjaran=document.getElementById('pTahun').value;
+    document.querySelectorAll('.wali-input').forEach(inp=> s.waliKelas[inp.dataset.k]=inp.value);
+    try{ await saveSettings(); showToast('Data lembaga disimpan'); renderShell(); }
+    catch(err){ alert('Gagal menyimpan data lembaga: '+err.message); }
+  };
+  document.getElementById('saveSKS').onclick = async ()=>{
+    document.querySelectorAll('.sks-input').forEach(inp=>{
+      s.sksMatrix[inp.dataset.k][inp.dataset.sub] = Number(inp.value)||0;
+    });
+    try{ await saveSettings(); showToast('Bobot SKS disimpan'); }
+    catch(err){ alert('Gagal menyimpan bobot SKS: '+err.message); }
+  };
+}
+
+/* ============================= INPUT NILAI ============================= */
+function renderInputNilai(c){
+  if(state.santri.length===0){
+    c.innerHTML = `<div class="page-head"><h1>Input Nilai Semester</h1></div><div class="card"><div class="empty"><div class="ic">◇</div>Tambahkan santri terlebih dahulu di menu Data Santri.</div></div>`;
+    return;
+  }
+  state.__inp = state.__inp || { santriId: state.santri[0].id, kelas: state.santri[0].kelasSekarang, semester:1 };
+  const sel = state.__inp;
+  const santriObj = state.santri.find(x=>x.id===sel.santriId) || state.santri[0];
+  sel.santriId = santriObj.id;
+
+  c.innerHTML = `
+    <div class="page-head"><div><h1>Input Nilai Semester</h1><div class="sub">Isi nilai untuk satu santri pada satu periode kelas &amp; semester</div></div></div>
+    <div class="card">
+      <div class="grid cols-3">
+        <div class="field"><label>Santri</label><select id="selSantri">${state.santri.map(s=>`<option value="${s.id}" ${s.id===sel.santriId?'selected':''}>${esc(s.nama)} — ${s.kelasSekarang}</option>`).join('')}</select></div>
+        <div class="field"><label>Kelas (periode)</label><select id="selKelas">${KELAS_LIST.map(k=>`<option value="${k}" ${k===sel.kelas?'selected':''}>${k}</option>`).join('')}</select></div>
+        <div class="field"><label>Semester</label><select id="selSemester"><option value="1" ${sel.semester==1?'selected':''}>1 (Ganjil)</option><option value="2" ${sel.semester==2?'selected':''}>2 (Genap)</option></select></div>
+      </div>
+    </div>
+    <div id="formArea"></div>
+  `;
+  document.getElementById('selSantri').onchange = (e)=>{ sel.santriId=e.target.value; renderInputNilai(c); };
+  document.getElementById('selKelas').onchange = (e)=>{ sel.kelas=e.target.value; renderInputNilai(c); };
+  document.getElementById('selSemester').onchange = (e)=>{ sel.semester=Number(e.target.value); renderInputNilai(c); };
+
+  const rec = getOrBlank(sel.santriId, sel.kelas, sel.semester);
+  const sksMap = state.settings.sksMatrix[sel.kelas]||{};
+  const formArea = document.getElementById('formArea');
+
+  function subjectTable(bidang){
+    const subs = SUBJECTS.filter(s=>s.bidang===bidang);
+    return `<div class="tbl-wrap"><table>
+      <thead><tr><th style="min-width:150px;">Mapel</th><th class="center">SKS</th><th class="center" style="width:64px;">UTS<br><span class="muted" style="font-weight:400;">maks 25</span></th><th class="center" style="width:64px;">UH/TG<br><span class="muted" style="font-weight:400;">maks 15</span></th><th class="center" style="width:64px;">Kehadiran<br><span class="muted" style="font-weight:400;">maks 10</span></th><th class="center" style="width:56px;">NH</th><th class="center" style="width:64px;">NU Awal</th><th class="center" style="width:64px;">NU Her</th><th class="center" style="width:56px;">NK</th><th class="center" style="width:64px;">NA</th></tr></thead>
+      <tbody>
+      ${subs.map(sub=>{
+        const sks = Number(sksMap[sub.id])||0;
+        const nv = rec.nilai[sub.id];
+        const cc = calcMapel(nv, sks);
+        return `<tr data-row="${sub.id}">
+          <td>${sub.label}</td>
+          <td class="center muted">${sks}</td>
+          <td><input type="number" data-sub="${sub.id}" data-f="uts" value="${nv.uts}" ${sks<=0?'disabled':''}></td>
+          <td><input type="number" data-sub="${sub.id}" data-f="uhtg" value="${nv.uhtg}" ${sks<=0?'disabled':''}></td>
+          <td><input type="number" data-sub="${sub.id}" data-f="hdr" value="${nv.hdr}" ${sks<=0?'disabled':''}></td>
+          <td class="center" data-out="nh">${cc.nh===null?'-':cc.nh}</td>
+          <td><input type="number" data-sub="${sub.id}" data-f="nuAwal" value="${nv.nuAwal}" ${sks<=0?'disabled':''}></td>
+          <td><input type="number" data-sub="${sub.id}" data-f="nuHer" value="${nv.nuHer}" ${sks<=0?'disabled':''}></td>
+          <td class="center num" data-out="nk"><b>${cc.nk===null?'-':fmt(cc.nk,1)}</b></td>
+          <td class="center num" data-out="na">${cc.na===null?'-':fmt(cc.na,1)}</td>
+        </tr>`;
+      }).join('')}
+      </tbody></table></div>`;
+  }
+
+  const h = rec.hafalan;
+  formArea.innerHTML = `
+    <div class="card">
+      <h3>A. Nilai Mata Pelajaran Diniyah</h3>
+      ${subjectTable('Diniyah')}
+    </div>
+    <div class="card">
+      <h3>B. Nilai Bahasa Arab</h3>
+      ${subjectTable('Bahasa Arab')}
+    </div>
+    <div class="card">
+      <h3>C. Hafalan</h3>
+      <div class="grid cols-3">
+        <div>
+          <label>Al Qur'an — Nilai Ujian</label>
+          <input type="number" id="hq_nilai" value="${h.alquran.nilai}">
+          <label style="margin-top:8px;">Jumlah Hafalan</label>
+          <input type="text" id="hq_jumlah" placeholder="cth. 9 JUZ" value="${esc(h.alquran.jumlah)}">
+          <label style="margin-top:8px;">Nama Surah / Rentang</label>
+          <input type="text" id="hq_surah" placeholder="cth. JUZ 1-2, AZ ZUMAR - JUZ 30" value="${esc(h.alquran.surah)}">
+        </div>
+        <div>
+          <label>Hadis — NH</label>
+          <input type="number" id="hh_nh" value="${h.hadis.nh}">
+          <label style="margin-top:8px;">Hadis — NU</label>
+          <input type="number" id="hh_nu" value="${h.hadis.nu}">
+          <label style="margin-top:8px;">Hadis yang Telah Dihafal</label>
+          <input type="text" id="hh_jumlah" placeholder="cth. Hadis 1 - 42" value="${esc(h.hadis.jumlah)}">
+        </div>
+        <div>
+          <label>Matan — NH</label>
+          <input type="number" id="hm_nh" value="${h.matan.nh}">
+          <label style="margin-top:8px;">Matan — NU</label>
+          <input type="number" id="hm_nu" value="${h.matan.nu}">
+          <label style="margin-top:8px;">Matan yang Telah Disetorkan</label>
+          <input type="text" id="hm_jumlah" placeholder="cth. Bab Thalabul Ilmi - Bab Liqoullah" value="${esc(h.matan.jumlah)}">
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>D. Kehadiran</h3>
+      <div class="grid cols-3">
+        <div class="field"><label>Sakit (hari)</label><input type="number" id="kd_sakit" value="${h ? rec.kehadiran.sakit : ''}"></div>
+        <div class="field"><label>Izin (hari)</label><input type="number" id="kd_izin" value="${rec.kehadiran.izin}"></div>
+        <div class="field"><label>Alpa / Tanpa Keterangan (hari)</label><input type="number" id="kd_alpa" value="${rec.kehadiran.alpa}"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>E. Ekstrakurikuler</h3>
+      <div class="grid cols-3" id="ekskulInputs">
+        ${state.settings.ekskulList.map(ek=>`<div class="field"><label>${esc(ek)}</label><input type="number" min="0" max="100" data-ek="${esc(ek)}" value="${rec.ekskul[ek]!==undefined?rec.ekskul[ek]:''}"></div>`).join('') || '<div class="muted">Belum ada daftar ekstrakurikuler. Tambahkan di menu Pengaturan.</div>'}
+      </div>
+    </div>
+    <div class="card">
+      <h3>F. Catatan Wali Kelas</h3>
+      <textarea id="catatanWali" placeholder="Tulis catatan perkembangan santri...">${esc(rec.catatan)}</textarea>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:30px;">
+      <div class="stat-card" style="padding:10px 16px;">
+        <div class="l">IP Semester ${ROMAN[periodeIdxOf(sel.kelas,sel.semester)]} (live)</div>
+        <div class="n" id="livePreviewIP" style="font-size:20px;">-</div>
+      </div>
+      <button class="btn gold" id="btnSaveInput" style="align-self:flex-end;">💾 Simpan Data Semester</button>
+    </div>
+  `;
+
+  function recalcRow(subId){
+    const sks = Number(sksMap[subId])||0;
+    const row = formArea.querySelector(`tr[data-row="${subId}"]`);
+    if(!row) return;
+    const get = f=> row.querySelector(`input[data-f="${f}"]`).value;
+    const cc = calcMapel({uts:get('uts'),uhtg:get('uhtg'),hdr:get('hdr'),nuAwal:get('nuAwal'),nuHer:get('nuHer')}, sks);
+    row.querySelector('[data-out="nh"]').textContent = cc.nh===null?'-':cc.nh;
+    row.querySelector('[data-out="nk"]').innerHTML = '<b>'+(cc.nk===null?'-':fmt(cc.nk,1))+'</b>';
+    row.querySelector('[data-out="na"]').textContent = cc.na===null?'-':fmt(cc.na,1);
+    updateLiveIP();
+  }
+  function updateLiveIP(){
+    let totalSKS=0,totalNA=0;
+    SUBJECTS.forEach(sub=>{
+      const sks=Number(sksMap[sub.id])||0; if(sks<=0) return;
+      const row = formArea.querySelector(`tr[data-row="${sub.id}"]`);
+      if(!row) return;
+      const get = f=> row.querySelector(`input[data-f="${f}"]`).value;
+      const cc = calcMapel({uts:get('uts'),uhtg:get('uhtg'),hdr:get('hdr'),nuAwal:get('nuAwal'),nuHer:get('nuHer')}, sks);
+      if(cc.nk!==null){ totalSKS+=sks; totalNA+=cc.na; }
+    });
+    const ipEl = document.getElementById('livePreviewIP');
+    ipEl.textContent = totalSKS>0 ? fmt(totalNA/totalSKS,2) : '-';
+  }
+  formArea.querySelectorAll('input[data-sub]').forEach(inp=>{
+    inp.oninput = ()=> recalcRow(inp.dataset.sub);
+  });
+  updateLiveIP();
+
+  document.getElementById('btnSaveInput').onclick = async ()=>{
+    const newRec = blankRecord();
+    SUBJECTS.forEach(sub=>{
+      const row = formArea.querySelector(`tr[data-row="${sub.id}"]`);
+      const get = f=> row.querySelector(`input[data-f="${f}"]`).value;
+      newRec.nilai[sub.id] = {uts:get('uts'),uhtg:get('uhtg'),hdr:get('hdr'),nuAwal:get('nuAwal'),nuHer:get('nuHer')};
+    });
+    newRec.hafalan.alquran = { nilai:document.getElementById('hq_nilai').value, jumlah:document.getElementById('hq_jumlah').value, surah:document.getElementById('hq_surah').value };
+    newRec.hafalan.hadis = { nh:document.getElementById('hh_nh').value, nu:document.getElementById('hh_nu').value, jumlah:document.getElementById('hh_jumlah').value };
+    newRec.hafalan.matan = { nh:document.getElementById('hm_nh').value, nu:document.getElementById('hm_nu').value, jumlah:document.getElementById('hm_jumlah').value };
+    newRec.kehadiran = { sakit:document.getElementById('kd_sakit').value, izin:document.getElementById('kd_izin').value, alpa:document.getElementById('kd_alpa').value };
+    formArea.querySelectorAll('[data-ek]').forEach(inp=>{ newRec.ekskul[inp.dataset.ek] = inp.value; });
+    newRec.catatan = document.getElementById('catatanWali').value;
+    newRec.tglRapor = rec.tglRapor || '';
+
+    const key = recKey(sel.santriId, sel.kelas, sel.semester);
+    const previous = state.records[key];
+    state.records[key] = newRec;
+
+    const btn = document.getElementById('btnSaveInput');
+    const originalLabel = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Menyimpan...';
+    try{
+      // Dulu di sini panggilan ke window.storage.set() bisa gagal tanpa
+      // pernah tertangkap (window.storage hanya ada di dalam Claude Artifacts,
+      // tidak ada saat aplikasi dijalankan sebagai website biasa). Akibatnya
+      // toast "tersimpan" tetap muncul padahal nilai santri TIDAK benar-benar
+      // masuk ke database, dan hilang begitu halaman di-refresh.
+      // Sekarang saveRecords() memanggil backend API sungguhan dan errornya
+      // ditangkap di sini sehingga user tahu jika penyimpanan gagal.
+      await saveRecords();
+      showToast('Data semester tersimpan');
+    }catch(err){
+      state.records[key] = previous; // rollback agar state lokal tidak menyesatkan
+      alert('Gagal menyimpan nilai: '+err.message+'. Nilai belum tersimpan di database, silakan coba lagi.');
+    }finally{
+      btn.disabled = false; btn.textContent = originalLabel;
+    }
+  };
+}
+
+/* ============================= LEGER PER KELAS ============================= */
+function renderLeger(c){
+  state.__leger = state.__leger || { kelas: KELAS_LIST[0], semester: 1 };
+  const sel = state.__leger;
+  c.innerHTML = `
+    <div class="page-head no-print"><div><h1>Leger Per Kelas</h1><div class="sub">Rekap seluruh santri &amp; mata pelajaran dalam satu periode</div></div>
+      <button class="btn secondary" id="btnPrintLeger">🖨 Cetak</button>
+    </div>
+    <div class="card no-print">
+      <div class="grid cols-2">
+        <div class="field"><label>Kelas</label><select id="selLKelas">${KELAS_LIST.map(k=>`<option value="${k}" ${k===sel.kelas?'selected':''}>${k}</option>`).join('')}</select></div>
+        <div class="field"><label>Semester</label><select id="selLSemester"><option value="1" ${sel.semester==1?'selected':''}>1 (Ganjil)</option><option value="2" ${sel.semester==2?'selected':''}>2 (Genap)</option></select></div>
+      </div>
+    </div>
+    <div id="print-area"></div>
+  `;
+  document.getElementById('selLKelas').onchange=(e)=>{ sel.kelas=e.target.value; renderLeger(c); };
+  document.getElementById('selLSemester').onchange=(e)=>{ sel.semester=Number(e.target.value); renderLeger(c); };
+  document.getElementById('btnPrintLeger').onclick = ()=> window.print();
+
+  const santriK = state.santri.filter(x=>x.kelasSekarang===sel.kelas);
+  const sksMap = state.settings.sksMatrix[sel.kelas]||{};
+  const activeSubs = SUBJECTS.filter(s=> (Number(sksMap[s.id])||0) > 0);
+
+  const rows = santriK.map(st=>{
+    const rec = getOrBlank(st.id, sel.kelas, sel.semester);
+    const nkVals = {};
+    activeSubs.forEach(s=>{ nkVals[s.id] = calcMapel(rec.nilai[s.id], sksMap[s.id]).nk; });
+    const ip = computeIP(st.id, sel.kelas, sel.semester);
+    return {st, nkVals, ip};
+  });
+  rows.sort((a,b)=> (b.ip||-1)-(a.ip||-1));
+
+  const avgPerSub = {};
+  activeSubs.forEach(s=>{
+    const vals = rows.map(r=>r.nkVals[s.id]).filter(v=>v!==null);
+    avgPerSub[s.id] = vals.length? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+  });
+
+  const area = document.getElementById('print-area');
+  if(santriK.length===0){
+    area.innerHTML = `<div class="card"><div class="empty"><div class="ic">◇</div>Belum ada santri di kelas ${sel.kelas}.</div></div>`;
+    return;
+  }
+  area.innerHTML = `
+    <div class="leger-sheet">
+      <h3 style="text-align:center;">LEGER NILAI — ${esc(sel.kelas)} · SEMESTER ${sel.semester==1?'1 (GANJIL)':'2 (GENAP)'} · T.A. ${esc(state.settings.tahunAjaran)}</h3>
+      <p style="text-align:center;color:var(--ink-soft);margin-top:0;">${esc(state.settings.unit)}</p>
+      <div class="scroll-x">
+      <table>
+        <thead><tr>
+          <th>No</th><th style="min-width:150px;">Nama Santri</th>
+          ${activeSubs.map(s=>`<th class="center">${s.label}</th>`).join('')}
+          <th class="center">IP</th><th class="center">Rangking</th>
+        </tr></thead>
+        <tbody>
+          ${rows.map((r,i)=>`<tr>
+            <td class="center">${i+1}</td><td>${esc(r.st.nama)}</td>
+            ${activeSubs.map(s=>`<td class="center num">${r.nkVals[s.id]===null?'-':fmt(r.nkVals[s.id],1)}</td>`).join('')}
+            <td class="center num"><b>${r.ip===null?'-':fmt(r.ip,2)}</b></td>
+            <td class="center">${r.ip===null?'-':(i+1)}</td>
+          </tr>`).join('')}
+          <tr style="background:var(--gold-soft);">
+            <td colspan="2"><b>Rata-rata Kelas</b></td>
+            ${activeSubs.map(s=>`<td class="center num"><b>${avgPerSub[s.id]===null?'-':fmt(avgPerSub[s.id],1)}</b></td>`).join('')}
+            <td colspan="2"></td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================= CETAK RAPOR ============================= */
+function renderRaporPage(c){
+  if(state.santri.length===0){
+    c.innerHTML = `<div class="page-head"><h1>Cetak Rapor</h1></div><div class="card"><div class="empty"><div class="ic">◇</div>Tambahkan santri terlebih dahulu.</div></div>`;
+    return;
+  }
+  state.__rapor = state.__rapor || { santriId: state.santri[0].id, kelas: state.santri[0].kelasSekarang, semester:1 };
+  const sel = state.__rapor;
+  c.innerHTML = `
+    <div class="page-head no-print"><div><h1>Cetak Rapor</h1><div class="sub">Pratinjau &amp; cetak laporan hasil belajar santri</div></div>
+      <button class="btn secondary" id="btnPrintRapor">🖨 Cetak / Simpan PDF</button>
+    </div>
+    <div class="card no-print">
+      <div class="grid cols-3">
+        <div class="field"><label>Santri</label><select id="selRSantri">${state.santri.map(s=>`<option value="${s.id}" ${s.id===sel.santriId?'selected':''}>${esc(s.nama)}</option>`).join('')}</select></div>
+        <div class="field"><label>Kelas</label><select id="selRKelas">${KELAS_LIST.map(k=>`<option value="${k}" ${k===sel.kelas?'selected':''}>${k}</option>`).join('')}</select></div>
+        <div class="field"><label>Semester</label><select id="selRSemester"><option value="1" ${sel.semester==1?'selected':''}>1 (Ganjil)</option><option value="2" ${sel.semester==2?'selected':''}>2 (Genap)</option></select></div>
+      </div>
+    </div>
+    <div id="print-area"></div>
+  `;
+  document.getElementById('selRSantri').onchange=(e)=>{ sel.santriId=e.target.value; renderRaporPage(c); };
+  document.getElementById('selRKelas').onchange=(e)=>{ sel.kelas=e.target.value; renderRaporPage(c); };
+  document.getElementById('selRSemester').onchange=(e)=>{ sel.semester=Number(e.target.value); renderRaporPage(c); };
+  document.getElementById('btnPrintRapor').onclick = ()=> window.print();
+
+  const st = state.santri.find(x=>x.id===sel.santriId);
+  const s = state.settings;
+  const rec = getOrBlank(sel.santriId, sel.kelas, sel.semester);
+  const sksMap = s.sksMatrix[sel.kelas]||{};
+  const diniyah = SUBJECTS.filter(x=>x.bidang==='Diniyah');
+  const bahasa = SUBJECTS.filter(x=>x.bidang==='Bahasa Arab');
+
+  function subjRows(list){
+    let totalSKS=0, totalNA=0;
+    const rowsHtml = list.map(sub=>{
+      const sks = Number(sksMap[sub.id])||0;
+      const cc = calcMapel(rec.nilai[sub.id], sks);
+      if(cc.nk!==null){ totalSKS+=sks; totalNA+=cc.na; }
+      return `<tr>
+        <td>${sub.label}</td>
+        <td class="center">${sks||'-'}</td>
+        <td class="center">${cc.nh===null?'-':cc.nh}</td>
+        <td class="center">${cc.nkAwal===null?'-':fmt(cc.nkAwal,0)}</td>
+        <td class="center">${cc.nkHer===null?'-':fmt(cc.nkHer,0)}</td>
+        <td class="center"><b>${cc.nk===null?'-':fmt(cc.nk,1)}</b></td>
+        <td class="center">${cc.na===null?'-':fmt(cc.na,1)}</td>
+      </tr>`;
+    }).join('');
+    return {rowsHtml, totalSKS, totalNA};
+  }
+  const rD = subjRows(diniyah), rB = subjRows(bahasa);
+  const totalSKS = rD.totalSKS + rB.totalSKS, totalNA = rD.totalNA + rB.totalNA;
+
+  const ipRow = periodeList().map(p=>{
+    const ip = computeIP(sel.santriId, p.kelas, p.semester);
+    const isCurrent = p.kelas===sel.kelas && p.semester===sel.semester;
+    return `<td class="center" style="${isCurrent?'background:var(--gold-soft);font-weight:700;':''}">${ip===null?'-':fmt(ip,2)}</td>`;
+  }).join('');
+  const ipk = computeIPK(sel.santriId, sel.kelas, sel.semester);
+  const predikat = predikatFor(ipk);
+  const rk = rankingFor(sel.santriId, sel.kelas, sel.semester);
+
+  function hafRow(no, nama, nh, nu, nk, ket){
+    const status = nk===null ? '-' : (nk>=s.kkmHafalan ? 'Tercapai' : 'Perlu Bimbingan');
+    return `<tr><td class="center">${no}</td><td>${nama}<br><span class="muted">${esc(ket||'')}</span></td>
+      <td class="center">${nh===null?'-':nh}</td><td class="center">${nu===null?'-':nu}</td>
+      <td class="center"><b>${nk===null?'-':fmt(nk,1)}</b></td><td class="center">${status}</td></tr>`;
+  }
+  const h = rec.hafalan;
+  const alquranNK = n(h.alquran.nilai);
+  const hadisNK = calcHafalanNK(h.hadis);
+  const matanNK = calcHafalanNK(h.matan);
+
+  const ekskulHtml = (s.ekskulList.length? s.ekskulList : []).map(ek=>`<tr><td>${esc(ek)}</td><td class="center">${rec.ekskul[ek]!==undefined && rec.ekskul[ek]!==''? rec.ekskul[ek] : '-'}</td></tr>`).join('') || '<tr><td colspan="2" class="muted center">Belum ada data</td></tr>';
+
+  document.getElementById('print-area').innerHTML = `
+    <div class="rapor-sheet">
+      <div class="kop">
+        <div class="y1">${esc(s.yayasan)}</div>
+        <div class="y1" style="font-size:14px;">${esc(s.unit)}</div>
+        <div class="y2">${esc(s.alamat)}, Kel. ${esc(s.kelurahan)}, Kec. ${esc(s.kecamatan)}, ${esc(s.kota)}, ${esc(s.provinsi)}</div>
+      </div>
+      <h2 class="title">Laporan Hasil Belajar Santri</h2>
+      <table class="ident-tbl" style="width:100%;">
+        <tr><td class="lbl">Nama</td><td class="colon">:</td><td><b>${esc(st?st.nama:'-')}</b></td><td class="lbl">Kelas</td><td class="colon">:</td><td>${esc(sel.kelas)}</td></tr>
+        <tr><td class="lbl">NISN</td><td class="colon">:</td><td>${esc(st?st.nisn:'-')||'-'}</td><td class="lbl">Semester</td><td class="colon">:</td><td>${sel.semester==1?'1 (Ganjil)':'2 (Genap)'}</td></tr>
+        <tr><td class="lbl">Alamat</td><td class="colon">:</td><td>${esc(st?st.alamat:'-')||'-'}</td><td class="lbl">Tahun Ajaran</td><td class="colon">:</td><td>${esc(s.tahunAjaran)}</td></tr>
+      </table>
+
+      <div class="sect-title">A. Mata Pelajaran Diniyah</div>
+      <table class="data"><thead><tr><th>Pelajaran</th><th class="center">SKS</th><th class="center">NH</th><th class="center">NK Awal</th><th class="center">NK Her</th><th class="center">NK</th><th class="center">NA</th></tr></thead>
+      <tbody>${rD.rowsHtml}</tbody></table>
+
+      <div class="sect-title">B. Bahasa Arab</div>
+      <table class="data"><thead><tr><th>Pelajaran</th><th class="center">SKS</th><th class="center">NH</th><th class="center">NK Awal</th><th class="center">NK Her</th><th class="center">NK</th><th class="center">NA</th></tr></thead>
+      <tbody>${rB.rowsHtml}
+        <tr style="background:var(--gold-soft);"><td><b>JUMLAH</b></td><td class="center"><b>${totalSKS}</b></td><td colspan="4"></td><td class="center"><b>${fmt(totalNA,1)}</b></td></tr>
+      </tbody></table>
+
+      <div class="grid cols-2" style="margin-top:14px;">
+        <div>
+          <div class="sect-title">Indeks Prestasi per Semester</div>
+          <table class="data"><thead><tr>${ROMAN.slice(1).map(r=>`<th class="center">Sem ${r}</th>`).join('')}</tr></thead>
+          <tbody><tr>${ipRow}</tr></tbody></table>
+        </div>
+        <div>
+          <div class="sect-title">Ringkasan</div>
+          <table class="ident-tbl">
+            <tr><td class="lbl">IPK</td><td class="colon">:</td><td><b>${ipk===null?'-':fmt(ipk,2)}</b></td></tr>
+            <tr><td class="lbl">Predikat</td><td class="colon">:</td><td><span class="ip-badge" style="background:var(--emerald-soft);color:var(--emerald);">${esc(predikat)}</span></td></tr>
+            <tr><td class="lbl">Rangking</td><td class="colon">:</td><td>${rk.rank?`Ke-${rk.rank} dari ${rk.total} santri`:'-'}</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="sect-title">C. Hafalan</div>
+      <table class="data"><thead><tr><th class="center" style="width:26px;">No</th><th>Deskripsi</th><th class="center">NH</th><th class="center">NU</th><th class="center">NK</th><th class="center">Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td class="center">1</td><td>Al Qur'an<br><span class="muted">${esc(h.alquran.jumlah||'-')} — ${esc(h.alquran.surah||'-')}</span></td><td class="center" colspan="2">Nilai Ujian</td><td class="center"><b>${alquranNK===null?'-':fmt(alquranNK,1)}</b></td><td class="center">${alquranNK===null?'-':(alquranNK>=s.kkmHafalan?'Tercapai':'Perlu Bimbingan')}</td></tr>
+        ${hafRow(2,'Hadis', n(h.hadis.nh), n(h.hadis.nu), hadisNK, h.hadis.jumlah)}
+        ${hafRow(3,'Matan', n(h.matan.nh), n(h.matan.nu), matanNK, h.matan.jumlah)}
+      </tbody></table>
+
+      <div class="grid cols-2" style="margin-top:10px;">
+        <div>
+          <div class="sect-title">D. Ekstrakurikuler</div>
+          <table class="data"><tbody>${ekskulHtml}</tbody></table>
+        </div>
+        <div>
+          <div class="sect-title">E. Kehadiran</div>
+          <table class="data">
+            <tr><td>Sakit</td><td class="center">${rec.kehadiran.sakit||'0'} Hari</td></tr>
+            <tr><td>Izin</td><td class="center">${rec.kehadiran.izin||'0'} Hari</td></tr>
+            <tr><td>Alpa</td><td class="center">${rec.kehadiran.alpa||'0'} Hari</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="sect-title">F. Catatan Wali Kelas</div>
+      <p style="font-size:12.8px; font-style:italic; border-left:3px solid var(--gold); padding-left:10px; margin:6px 0 0;">${esc(rec.catatan)||'—'}</p>
+
+      <div class="sign-block">
+        <div class="col">Dikeluarkan di: ${esc(s.kecamatan)}<div class="sp"></div>Orang Tua/Wali<br><br><br>(...........................)</div>
+        <div class="col">&nbsp;<div class="sp"></div>Wali Kelas<br><br><br><b>${esc(s.waliKelas[sel.kelas]||'...........................')}</b></div>
+        <div class="col">Tanggal: ${esc(rec.tglRapor)||'...........................'}<div class="sp"></div>Kepala Unit<br><br><br><b>${esc(s.kepalaUnit)||'...........................'}</b></div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================= RIWAYAT 6 SEMESTER ============================= */
+function renderRiwayat(c){
+  if(state.santri.length===0){
+    c.innerHTML = `<div class="page-head"><h1>Riwayat 6 Semester</h1></div><div class="card"><div class="empty"><div class="ic">◇</div>Tambahkan santri terlebih dahulu.</div></div>`;
+    return;
+  }
+  state.__riw = state.__riw || { santriId: state.santri[0].id };
+  const sel = state.__riw;
+  const st = state.santri.find(x=>x.id===sel.santriId);
+
+  c.innerHTML = `
+    <div class="page-head"><div><h1>Riwayat 6 Semester</h1><div class="sub">Rekap perjalanan akademik dari Kelas 1 SMA Semester 1 hingga Kelas 3 SMA Semester 2</div></div></div>
+    <div class="card">
+      <div class="field" style="max-width:340px;"><label>Pilih Santri</label><select id="selRiwSantri">${state.santri.map(s=>`<option value="${s.id}" ${s.id===sel.santriId?'selected':''}>${esc(s.nama)}</option>`).join('')}</select></div>
+    </div>
+    <div id="riwArea"></div>
+  `;
+  document.getElementById('selRiwSantri').onchange=(e)=>{ sel.santriId=e.target.value; renderRiwayat(c); };
+
+  const periods = periodeList();
+  const ips = periods.map(p=> computeIP(sel.santriId,p.kelas,p.semester));
+  const maxIP = 100;
+  const finalIdx = (()=>{ for(let i=periods.length-1;i>=0;i--){ if(ips[i]!==null) return i; } return -1; })();
+  const ipk = finalIdx>=0 ? computeIPK(sel.santriId, periods[finalIdx].kelas, periods[finalIdx].semester) : null;
+
+  const barsHtml = periods.map((p,i)=>`
+    <div class="bar-row">
+      <div class="lbl">${p.kelas} · Sem ${p.semester} (${ROMAN[i+1]})</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${ips[i]?Math.min(100,ips[i]):0}%"></div></div>
+      <div class="bar-val">${ips[i]===null?'-':fmt(ips[i],1)}</div>
+    </div>`).join('');
+
+  const allSubs = SUBJECTS;
+  const subjTableHtml = `<div class="tbl-wrap"><table>
+    <thead><tr><th>Mata Pelajaran</th>${periods.map((p,i)=>`<th class="center">${ROMAN[i+1]}</th>`).join('')}</tr></thead>
+    <tbody>
+    ${allSubs.map(sub=>{
+      const cells = periods.map(p=>{
+        const sks = Number((state.settings.sksMatrix[p.kelas]||{})[sub.id])||0;
+        if(sks<=0) return `<td class="center muted">-</td>`;
+        const rec = getRecord(sel.santriId,p.kelas,p.semester);
+        if(!rec) return `<td class="center muted">-</td>`;
+        const cc = calcMapel(rec.nilai[sub.id], sks);
+        return `<td class="center num">${cc.nk===null?'-':fmt(cc.nk,1)}</td>`;
+      }).join('');
+      return `<tr><td>${sub.label}</td>${cells}</tr>`;
+    }).join('')}
+    </tbody></table></div>`;
+
+  document.getElementById('riwArea').innerHTML = `
+    <div class="card">
+      <h3>Perkembangan IP per Semester — ${esc(st?st.nama:'')}</h3>
+      ${barsHtml}
+      <div style="display:flex;gap:22px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);">
+        <div><div class="muted" style="font-size:12px;">IPK Terakhir</div><div style="font-family:'Fraunces',serif;font-size:24px;color:var(--emerald);font-weight:600;">${ipk===null?'-':fmt(ipk,2)}</div></div>
+        <div><div class="muted" style="font-size:12px;">Predikat</div><div style="font-family:'Fraunces',serif;font-size:24px;color:var(--emerald);font-weight:600;">${predikatFor(ipk)}</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Nilai (NK) per Mata Pelajaran — 6 Semester</h3>
+      ${subjTableHtml}
+    </div>
+  `;
+}
+
+/* ============================= AUTH / LOGIN ============================= */
+function showLogin(errMsg){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="mark">ﷲ</div>
+        <h1>Rapor Digital Santri</h1>
+        <div class="sub">Masuk untuk mengelola data nilai santri</div>
+        <div class="err" id="loginErr">${errMsg?esc(errMsg):''}</div>
+        <div class="field"><label>Username</label><input type="text" id="loginUser" autocomplete="username"></div>
+        <div class="field"><label>Kata Sandi</label><input type="password" id="loginPass" autocomplete="current-password"></div>
+        <button class="btn-login" id="btnDoLogin">Masuk</button>
+        <div class="foot">Hubungi admin pesantren jika belum memiliki akun.</div>
+      </div>
+    </div>
+  `;
+  const errEl = document.getElementById('loginErr');
+  if(errMsg) errEl.classList.add('show');
+  const doLogin = async ()=>{
+    const username = document.getElementById('loginUser').value.trim();
+    const password = document.getElementById('loginPass').value;
+    if(!username || !password){ errEl.textContent='Username dan kata sandi wajib diisi.'; errEl.classList.add('show'); return; }
+    const btn = document.getElementById('btnDoLogin');
+    btn.disabled = true; btn.textContent = 'Memeriksa...';
+    try{
+      const res = await fetch('/api/login', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.error || 'Login gagal');
+      setToken(data.token);
+      state.userName = data.name || username;
+      await boot();
+    }catch(err){
+      btn.disabled = false; btn.textContent = 'Masuk';
+      errEl.textContent = err.message; errEl.classList.add('show');
+    }
+  };
+  document.getElementById('btnDoLogin').onclick = doLogin;
+  document.getElementById('loginPass').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+}
+
+/* ============================= INIT ============================= */
+async function boot(){
+  document.getElementById('app').innerHTML = '<div style="padding:60px;text-align:center;color:#4b5c52;font-family:Inter,sans-serif;">Memuat aplikasi...</div>';
+  try{
+    const me = await apiFetch('/api/me');
+    state.userName = me.name;
+    await loadAll();
+    renderShell();
+  }catch(err){
+    // loadAll melempar hanya kalau apiFetch mendeteksi 401 (token
+    // tidak valid/kadaluarsa) — showLogin() sudah dipanggil di apiFetch.
+  }
+}
+async function init(){
+  if(!getToken()){ showLogin(); return; }
+  await boot();
+}
+init();
+</script>
+</body>
+</html>
